@@ -9,9 +9,10 @@ const oLines = [];
 
 const allSymbols = {};
 const allNumbers = [];
+const allStars = {};
 
 
-function main(){
+function main3a(){
     console.log("Starting 3A");
 
     var partNums = [];
@@ -43,19 +44,42 @@ function main(){
 
 
             thisChar.isASymbol = thisChar.charValue < 0;
+            thisChar.isAStar = thisChar.char = "*";
             thisChar.isADigit = ( -1 < thisChar.charValue && thisChar.charValue  < 10 ? true : false );
             thisChar.isADot = thisChar.charValue == 10;
             thisChar.appendDigit = appendDigit;
             thisChar.isNextToASymbol = isNextToASymbol;
 
 
+
             if(thisChar.isADigit && prevDigit.isADigit ) thisChar.prevDigit = prevDigit;
 
             
-            if(thisChar.isASymbol) allSymbols[ `${lineIx}.${charIx}`] = thisChar;
+            if(thisChar.isASymbol) {
+                thisChar.adjacentNumberCount = 0;
+                allSymbols[ `${lineIx}.${charIx}`] = thisChar;
+                if( thisChar.isAStar ) {
+                    allStars[`${lineIx}.${charIx}` ] = thisChar;
+                    thisChar.adjacentNumbers = [];
+                }
+
+            }
 
             if(thisChar.isADigit) { 
-                
+            
+                let aCells = thisChar.adjacentCells = {};
+
+                for(var r=-1; r<2; r++){
+                    for(var c=-1; c<2; c++){
+                        if(r!=0||c!=0){
+                            let xr = thisChar.lineIx + r
+                            let xc = thisChar.charIx + c
+                            let key=`${xr}.${xc}`
+                            aCells[key]=key ;
+                        }   
+                    };
+                };
+
                 if( prevDigit.isADigit ) { 
                         prevDigit.nextDigit = thisChar;
                         prevDigit.appendDigit( thisChar  )
@@ -96,12 +120,15 @@ function main(){
     console.log(`Total of all part numbers: ${sumOfParts}`)
     console.log(`All the part numbers added: ${numbersAdded.toString()}`)
     console.log("Finished 3A")
+
 }
 
 
 
 function appendDigit ( oChar ){
     this.numValue = this.numValue * 10 + oChar.charValue;
+    // add all the adjacent cells of the added digit for this number
+    Object.assign( this.adjacentCells, oChar.adjacentCells )
     if(this.prevDigit) if(this.prevDigit.isADigit){
         this.prevDigit.appendDigit( oChar );
         this.numValue = this.prevDigit.numValue ;
@@ -134,4 +161,47 @@ function isNextToASymbol(){
 
 };
 
-main();
+function registerWithAdjacentStars(number){
+    
+    let r = number.lineIx;
+    let c = number.charIx;
+    //console.log(`Checking if number at ${r}.${c} is next to a symbol`);
+    let neighbours = number.adjacentCells;
+    let keys = Object.keys( neighbours );
+
+    keys.forEach( key=>{
+        
+        let star = allStars[key]
+        if(star){
+            star.adjacentNumbers.push( number )
+        }
+    })
+
+}
+
+function main3b(){
+    
+    let totalRatios = 0;
+    
+    allNumbers.forEach( number=>{
+        registerWithAdjacentStars(number);
+    });
+
+    let keys = Object.keys(allStars);
+    
+    keys.forEach( key=>{
+        let star = allStars[key];
+        if( star.adjacentNumbers.length == 2 ){
+            let n1 = star.adjacentNumbers[0].numValue
+            let n2 = star.adjacentNumbers[1].numValue
+            let ratio = n1 * n2;
+            totalRatios += ratio;
+            console.log(`Star at ${star.lineIx}.${star.charIx} has 2 adjecent numbers, ${n1} and ${n2} so it is a gear with ratio ${ratio} `)
+        }
+    })
+    console.log(`Total of all ratios is ${totalRatios}`);
+}
+
+
+main3a();
+main3b();
