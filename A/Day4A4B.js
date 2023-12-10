@@ -1,3 +1,5 @@
+"use strict";
+
 const fs = require("fs");
 
 const colourLimits = { "red": 12, "green": 13, "blue": 14}
