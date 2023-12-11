@@ -1,12 +1,15 @@
 "use strict";
 
+/**
+ * Day 5B. Same as 5A except we need to treat the seeds line as ranges of seed numbers.
+ */
 const fs = require("fs");
 
 const colourLimits = { "red": 12, "green": 13, "blue": 14}
 const nonSymbol = "0123456789.";
 
 // Array of all the input seed numbers from line 1
-const allSeeds=[];
+const allSeedRanges=[];
 
 // Array of the code maps e.g. from seed to soil, or humidity to location
 // The key is the name of the from dimension e.g. "seed" or "humidity"
@@ -46,17 +49,36 @@ function main5a(){
                 // looking for the seeds line, which is line 1 of the input
                 // check that this is indeed the seeds line
                 if(line.slice(0, 6)=="seeds:"){
+                    // VERSION 5B
                     // split the seed numbers in the line into an array of strings
                     let sSeeds = line.slice(7).split(" ");
-                    // convert the strings into numbers and save in the allSeeds array
-                    sSeeds.forEach(sSeed=>{
-                        let seed = parseInt(sSeed);
-                        allSeeds.push(seed)
+
+                    // convert the strings into numbers and save in the allSeedRanges array
+                    let seedRange;
+
+                    sSeeds.forEach( (sSeedId,ix) =>{
+                        let seedId = parseInt(sSeedId);
+                        // check odd and even entries. Even is start and odd is count of each range
+                        if(ix%2==0){
+                            // even, so this is the start of the range
+                            seedRange ={ start: seedId }
+                        } else {
+                            // odd so this is the number of seeds in the range
+                            // output all the seed numbers between start and end of the range
+                            seedRange.count = seedId
+                            allSeedRanges.push( seedRange );
+                        }
                     })
-                    console.log(`${allSeeds.length} seeds were loaded.`)
+
+
+
+
+                    console.log(`${allSeedRanges.length} seed ranges were loaded.`)
+                    console.log( allSeedRanges )
                     // change state. startMap means we are looking for the next map table
                     console.log(`Now look for the first mapping table in the input file`)
                     inputState = "startMap"
+
                 }
 
                 break;
@@ -133,7 +155,6 @@ function main5a(){
     
     // report all the maps
     let mapNames = Object.keys(mapsIndex);
-
     console.log("Maps:", mapNames);
 
     // TEST -------------------------
@@ -145,32 +166,28 @@ function main5a(){
     // ------------------------------
 
 
-    // now establish the location for all the input seeds ============================
+    // now establish the lowest location for all the input seeds ============================
 
     // get the seed map from the maps index
     let seedMap = mapsIndex["seed"];
     
     // set the lowest location to a high value. This will be replaced with the lowest location number
     let lowestLocation = 999999999999;
-
-    // create an array of seed to location mapping results for reporting
-    let results = [];
-
+    let seedCount = 0;
     // check the location code corresponding to every seed
-    allSeeds.forEach(seed=>{
-        // getUltimateLocation will call repeatedly down the maps until the location is discovered
-        let loc = seedMap.getUltimateLocation(seed);
+    allSeedRanges.forEach( (seedRange, ix)=>{
+        console.log(`Processing range`, seedRange);
+        seedCount += seedRange.count;
 
-        // check if this is the lowest location number so far
-        if(loc < lowestLocation) lowestLocation = loc;
-        let result = {
-            seed, loc
+        for( let ix = 0; ix < seedRange.count ; ix++){
+            let seed = seedRange.start + ix;
+            // getUltimateLocation will call repeatedly down the maps until the location is discovered
+            let loc = seedMap.getUltimateLocation(seed);
+            if(loc < lowestLocation) lowestLocation = loc;
         }
-        results.push( result )
+        console.log(`Processed ${seedCount} seeds so far, and lowest location is ${lowestLocation}....`)
     });
 
-    // report the locations for all the seeds
-    console.log(`Results:`, results );
 
     // report the lowest location
     console.log(`Lowest location is ${lowestLocation}`);
@@ -250,11 +267,11 @@ class Mapper{
 
         // Check if an entry was found in mapTable. If not, then the toKey is equal to the fromKey.
         if(matchingEntry){
-            console.log(`${this.mapFrom} code ${fromKey} maps to ${this.mapTo} code ${mappedTo} using entry with base key ${matchingEntry.fromKeyMin}`)
+            //console.log(`${this.mapFrom} code ${fromKey} maps to ${this.mapTo} code ${mappedTo} using entry with base key ${matchingEntry.fromKeyMin}`)
         } else {
             // There was no matching map entry so just return the input fromKey.
             mappedTo = fromKey;
-            console.log(`${this.mapFrom} code ${fromKey} maps to ${this.mapTo} code ${fromKey} because there is no mapping entry`)
+            //console.log(`${this.mapFrom} code ${fromKey} maps to ${this.mapTo} code ${fromKey} because there is no mapping entry`)
         }
 
         return mappedTo; 
