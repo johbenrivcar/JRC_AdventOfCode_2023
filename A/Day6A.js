@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * Day 5B. Same as 5A except we need to treat the seeds line as ranges of seed numbers.
+ * Day 6A
  */
 const fs = require("fs");
 
