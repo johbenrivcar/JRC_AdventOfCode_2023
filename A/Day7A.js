@@ -28,7 +28,7 @@ function main7a(){
 
     // load the input file
     var data = fs.readFileSync('Day7Input.txt', 'utf8');
-    
+     
     // Convert the input text into an array, each entry is one line
     let txt = data.toString();
     let lines = txt.split("\r\n");
