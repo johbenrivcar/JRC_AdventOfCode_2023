@@ -1,0 +1,3 @@
+I am really puzzled by day 8 part two. I have approached the problem with a brute-force attack and it seems that I am stepping through the desert wasteland forever. I have been over a trillion steps and still not reached the destination.
+It seems there are only two possibilities - either there is a bug in my code, which I cannot find, or I have misread the instructions, even though I have read them through many times over.
+I have looked at other, rather cleverer, approaches than mine
