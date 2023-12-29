@@ -4,33 +4,35 @@
  * Day 8A
  */
 const fs = require("fs");
-const { setTimeout } = require( 'node:timers/promises' );
 
-// This contains all the nodes from the input, with the alphabetic keys replaced by indexes
-// So, for example, the input line DFA = (TJT, DMP) from line 53 of the input becomes the node
-// with index 9 in the map [ 657, 710, 0, 50, 'DFA' ] which are:
-//  657 index of the node to the Left i.e. TJT
-//  710 index of the node to the Right i.e. DMP
-//  0 node type: 0=ends with A, 1=ends with Z, -1=any other char
-//  DFA original key for this node
-var nodeMap;
 
-// Array of L/R characters for left and right steps, from first line of the input
+// Array of L/R characters, for left and right steps, obtained from first line of the input
 var steps;
 
-// rray of L/R characters for left and right steps, from first line of the input,
-// converted from strings to numbers, where 0 is L and 1 is R
+// Array of L/R steps converted from strings to numbers, where 0 is L and 1 is R
 var nSteps;
 
-// Array containing the stepping nodes that we are currently positioned on, used to run through the steps.
-// Initially these are the nodes whose key ends with the letter A. In the input data there are six of them.
+// Array containing the stepping nodes that we are currently positioned on, 
+// used to progress step-by-step through the nodes.
+// Initially these are the nodes whose keys end with the letter A. In the input data there are six of them.
 // When each step is taken, all the steppers are replaced by the next node pointed to by the direction
 // of the step, either left or right.
 var steppers  = [];
 
 // The original input, split into lines. After the initial load the first two lines are removed, so this
 // contains only the lines that contain nodes, in the format XXXX = (YYYY, ZZZZ)
+// This input is converted into the nodeMap
 var lines;
+
+// nodeMap contains all the nodes from the input, with the alphabetic keys replaced by indexes
+// So, for example, the input line DFA = (TJT, DMP) from line 53 of the input becomes the node
+// with index 50 in the map, represented as an array [ 657, 710, 0, 50, 'DFA' ] where
+//  657 is the index of the node to the Left i.e. TJT
+//  710 is the index of the node to the Right i.e. DMP
+//  0 node type: 0=ends with A, 1=ends with Z, -1=any other char
+//  50 is the index of this node
+//  DFA is original key for this node
+var nodeMap;
 
 // contains a lookup from the alpha key for a node to a specific index number in the nodes array
 var index2Key = [];
@@ -96,28 +98,43 @@ async function main8b(){
     // Now we are ready to run the steps through the steppers
     
 
-    // endsCount is the number of steppers that have reached the destination, i.e. that have
+  
+
+    // stepperCount is the number of steppers. When all of them have reache a node ending with Z
+    // on the same step then we have reached the destination.
+    var stepperCount = steppers.length;  
+    
+    // enderCount is the number of steppers that have reached the destination, i.e. that have
     // a key ending in Z
     var enderCount = 0;
-    // finLimit is the number of steppers that must end in Z after they have all taken a step, to
-    // indicate that we have reach the destination, i.e. all the steppers are on a node ending with Z
-    var stepperCount = steppers.length;
+
+    // Stepinfo provides the given sequence of steps and the current step number
+    // within that sequence. We cycle round and round the sequence until the ending
+    // condition is met.
     var stepInfo = { stepNumber: 0, nSteps: nSteps }
+
     // Create the nextstep function which provides a stream of steps cycling round the step list
     var nextStep = fnNextStep( stepInfo )
-    // Loop until the all the steppers have reached an ender node (ending with Z)
-    while( enderCount<stepperCount ){
-        
 
+
+    // Loop until the all the steppers have reached an ender node (ending with Z)
+    // The end condition is when every stepper has reached a node ending with Z.
+    while( enderCount < stepperCount ){
+    
             enderCount = 0; 
+            // get the next step
             let step = nextStep();
 
+            // move to the next node for each stepper following the step instruction
             steppers = steppers.map(
                 
-                (stepper, ix)=>{
-                    var n = nodeMap[stepper[step]];
-                    // increment the ender cound if this is an ender
-                    enderCount+=n[3];
+                (stepper)=>{
+                    var n = nodeMap[ stepper[step] ];
+                    // increment the ender cound if this is an ender, which is indicated
+                    // by 1 at index 3 in the node data.
+                    enderCount += n[3];
+
+                    // return the new node position for this stepper.
                     return n
                 }
             );
