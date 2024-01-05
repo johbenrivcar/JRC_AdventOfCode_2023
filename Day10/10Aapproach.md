@@ -12,9 +12,9 @@ The cell we have reached:
 
 There are six pipe types
 
-    /|\
+    J|L
     -+-
-    \|/
+    7|F
 
 1. Straight up and down |, permitted moves are T>B and B>T
 2. Left to Top J, permitted moves are L>T and T>L

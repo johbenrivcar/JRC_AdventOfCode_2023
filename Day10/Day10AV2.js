@@ -5,29 +5,43 @@
  */
 
 const fs = require("fs");
-const directionIncrements = { N:[-1,0,"S"], E:[0,1,"W"], S:[1,0,"N"], W:[0,-1,"E"]}
 
-const allNodes = {};
-// The array of numbers indicate the entry point of the NEXT cell indexed by your entry point on THIS cell
+// Throughout, the directions NESW are converted to integers 0123 for indexing
+const dir2Index = "NESW";
+
+// gives the row/column increments that apply for each direction of movement N S E or W, and 
+// the direction into the next node that results from that movement.
+// e.g. for a move N, move -1 row and 0 col, coming from the S
+//                              N:r  c  d   E:r  c  d   S:r  c  d   W:r  c  d
+const directionIncrements = [  [ -1, 0, 2], [ 0, 1, 3], [ 1, 0, 0], [ 0,-1, 2] ];
+
+
+// The array of numbers indicate the entry point on the NEXT cell indexed by your entry point on THIS cell
 // The entry and exit points are numbered 0-N, 1-E, 2-S, 3-W
 // -1 indicates no entry
+// So for example, if I enter from the south (2) into a cell containing the pipe shape "7", then the exit point 
+// will be west (3).
 const moves = { 
-    "|":[ 0, -1, 2, -1 ], 
-    "-":[-1, 2, -1, 3] , 
-    "L":[ 1, 0,-1,-1], 
-    "J":[ 3,-1,-1,0], 
-    "7":[-1,-1,3,2], 
-    "F":[-1, 0, 3, -1]
-
+    "|":[ 0, -1,  2, -1 ], 
+    "-":[-1,  2, -1,  3] , 
+    "L":[ 1,  0, -1, -1], 
+    "J":[ 3, -1, -1,  0], 
+    "7":[-1, -1,  3,  2], 
+    "F":[-1,  0,  3, -1]
 }
+
+
 // Index change gives the change to the current row and column needed to make entry to
 // the next cell given the entry point to the next cell.
-const indexChanges=[ [1, 0], [0,-1],[ -1 , 0], [ 0, 1 ] ];
+// So, if I an entering from the west (3), then I need to change my current row by 0 and col by +1
+const indexChanges=[ [ 1, 0], [ 0, -1], [-1 , 0], [ 0, 1] ];
 
+// The array of cells making up the whole 2-d space of the landscape of the Pipe Maze
 const wholeField = [];
 
+
 function main10a(){
-    console.log("Starting 9B -----------------------------------------------------------------");
+    console.log("Starting 10A -----------------------------------------------------------------");
 
     // load the input file
     var data = fs.readFileSync('Day10Input.txt', 'utf8');
@@ -35,47 +49,61 @@ function main10a(){
     // Convert the input text into an array, each entry is one line
     let txt = data.toString();
     let lines = txt.split("\r\n");
-    let startRC;
+    let startCell = null;
     console.log(lines);
 
-    lines.forEach( (line,ix)=>{
-        let start = line.indexOf(`S`);
-        let row = line.split('');
-        wholeField.push(row);
-        if( start > -1 ){
-            startRC = [ ix, start ]
-            console.log(`Start is at  ${startRC}`);
-        };
+    wholeField = lines.map( (line,rowIx)=>{
+
+        let row = line.split('').map( (char,colIx)=>{
+            let n = new Node( rowIx, colIx, char) ;
+
+            if(char=="S") startCell = n;
+            return n;
+
+        });
+
+        return row;
     });
 
-    let moveField = [];
 
-    let newField = wholeField.forEach( (inRow, rowIX) =>{
-        let outRow = inRow.map( (cell, colIX)=>{
+    wholeField.forEach( (fieldRow, rowIX) =>{
+        fieldRow.forEach( (cell, colIX)=>{
             
-            if( cell == "S" ){
-                console.log ( `Start is at ${rowIX}, ${colIX}`)
-                let neighbours = [
-                        rowIX>0? wholeField[rowIX-1][colIX]: null,
-                        colIX>0? wholeField[rowIX][colIX+1]: null,
-                        rowIX<wholeField.length-1? wholeField[rowIX+1][colIX]: null,
-                        colIX<inRow.length-1? wholeField[rowIX][colIX-1]: null
-                    ];
-                console.log(`Start neighbours:`, neighbours)
-            }
-            let ixChange = indexChanges[cell];
-            return { cell};
-        })
-        return outRow
-    } )
+            cell.neighbours = [
+                //N
+                    rowIX>0? 
+                        wholeField[rowIX-1][colIX]
+                        : null,
+                //E
+                    colIX>0? 
+                        wholeField[rowIX][colIX+1]
+                        : null,
+
+                //S
+                    rowIX<wholeField.length-1 ? 
+                            wholeField[rowIX+1][colIX]
+                        : null,
+
+                //W
+                    colIX<fieldRow.length-1 ? 
+                        wholeField[rowIX][colIX-1]
+                        : null
+
+                ];
+
+            //let ixChange = indexChanges[cell.pType];
+
+        });
+
+    } );
+        
 
 
     reportField(wholeField);
 
-    let currentCell = startRC;
-    let cell = wholeField[startRC[0]][startRC[1]];
+    let cell = startCell;
 
-    let cellChain = [ {startRC, cell} ];
+    //let cellChain = [ {startRC, cell} ];
     let f, t;
     let row = startRC[0];
     let col = startRC[1];
@@ -96,6 +124,7 @@ function main10a(){
         default:
             throw new Error( "Could not find from/to for starting cell");    
     }
+
     const to2rcIncrement = [ [-1,0], [0,1], [1, 0], [0, -1] ];
     do {
         let nr, nc;
@@ -229,21 +258,22 @@ function checkConnection( dir, from, to ){
 //
 
 function reportField(field){ 
-    var gridLine="    +0        +10       +20       +30       +40       +50       +60       +70       +80       +90       +100      +110      +";
+    var gridLine="    v0        v10       v20       v30       v40       v50       v60       v70       v80       v90       v100      v110      v";
            
     field.forEach((row,rowIx)=>{
         if(rowIx%10===0){
            
             console.log(gridLine);
         }
-        let rowLine = `   ${rowIx} `.slice(-4) + row.join("");
-        console.log(rowLine)
+        let rowLine1 = `   ${rowIx} `.slice(-4) ;
+        row.forEach( (cell, colIx)=>{
+            rowLine1+= cell.pType
+        })
+        console.log(rowLine1)
     })
 
 }
     
-main10a();
-
 
 // CLASS DECLARATIONS
 
@@ -256,14 +286,19 @@ class Node{
      */
     row = 0;
     col = 0;
-    ports = { }
+    pType = "";
+    ports = [];
     pipe = null;
+
     constructor( r, c, pType ){
         this.row = r;
         this.col = c;
+        this.pType = pType;
+
         if(pType){
-            this.pipe = new Pipe(this, pType, ports)
+            this.pipe = new Pipe(this, pType)
         };
+
     };
 
     connect(){
@@ -320,32 +355,33 @@ class Node{
 class Pipe{
     owner=null;
 
-    constructor(node, pipeShape, ports){
-        owner = node;
+    constructor(node, pipeShape){
+        let ports = node.ports;
+        this.owner = node;
         switch(pipeShape){
             case "J": 
-                ports.N = newPort("N") ;
-                ports.W = newPort("W") ;
+                ports[0] = new Port(this,"N") ;
+                ports[3] = new Port(this,"W") ;
                 break;
             case "|":
-                ports.N = newPort("N");
-                ports.S = newPort("S");
+                ports[0] = new Port(this,"N");
+                ports[2] = new Port(this,"S");
                 break;
             case "L":
-                ports.N = newPort("N");
-                ports.E = newPort("E");
+                ports[0] = new Port(this,"N");
+                ports[1] = new Port(this,"E");
                 break;
             case "-":
-                ports.W = newPort("W");
-                ports.E = newPort("E");
+                ports[3] = new Port(this,"W");
+                ports[1] = new Port(this,"E");
                 break;
             case "7":
-                ports.W = newPort("W");
-                ports.S = newPort("S");
+                ports[3] = new Port(this,"W");
+                ports[2] = new Port(this,"S");
                 break;
             case "F":
-                ports.E = newPort("E");
-                ports.S = newPort("S");
+                ports[1] = new Port(this,"E");
+                ports[2] = new Port(this,"S");
                 break;
             case "S":
                 this.startPipe = true;
@@ -354,11 +390,11 @@ class Pipe{
                 throw new Error(`Invalid port type [${pipeShape}]`);
         }
     }
-    newPort(dir){
-        return new Port(dir, this)
-    }
-}
+};
 
+function newPort(pipe, dir){
+    return new Port(pipe, dir)
+}
 class Port{
     dir;
     pipe;
@@ -378,3 +414,8 @@ class Port{
 
     }
 }
+
+
+
+main10a();
+
