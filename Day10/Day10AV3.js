@@ -12,17 +12,17 @@ const monitoredTiles = [];
 const fs = require("fs");
 
 
-// Throughout, the directions NESW are converted to integers 0123 for indexing
-// Directions are important to establishing the actual route through the whole
-// pipe circuit. By convention N is up S is down etc. etc.
-const dirIndex = "NESW";
-function dirChar2Ix(char){ return dirIndex.indexOf(char)};
-function dirIx2Char(ix){ return dirIndex.charAt(ix)};
+// // Throughout, the directions NESW are converted to integers 0123 for indexing
+// // Directions are important to establishing the actual route through the whole
+// // pipe circuit. By convention N is up S is down etc. etc.
+// const dirIndex = "NESW";
+// function dirChar2Ix(char){ return dirIndex.indexOf(char)};
+// function dirIx2Char(ix){ return dirIndex.charAt(ix)};
 
 // Translate pipe shape into an index number
 const pipeIndex = "|-LJ7F.S";
 function pipeChar2Ix(char){return pipeIndex.indexOf(char);}
-function pipeIx2Char(ix){return pipeIndex.charAt(ix)};
+//function pipeIx2Char(ix){return pipeIndex.charAt(ix)};
 
 // Maps the next move, given the last move
 // and the index of the pipe shape of the current tile.
@@ -60,7 +60,7 @@ function main10a(){
 
     // load the input file
     //var data = fs.readFileSync('Day10TestInput3.txt', 'utf8');
-    var data = fs.readFileSync('Day10TestInput3.txt', 'utf8');
+    var data = fs.readFileSync('Day10Input.txt', 'utf8');
     console.log("data", data);
 
     // Convert the input text into an array, each entry is one line
