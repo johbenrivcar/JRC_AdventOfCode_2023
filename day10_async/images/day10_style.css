@@ -1,0 +1,165 @@
+    body{
+        
+        font-family: 'Courier New', Courier, monospace;
+        display: relative;
+        overflow: hidden;
+    }
+
+    .hidden{
+        display: none;
+    }
+
+     .outer{
+        background: yellowgreen;
+        z-index: -1;
+        width: 100%;
+        box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -o-box-sizing: border-box;
+    
+    }
+
+    .scroller {
+        height: calc(100vh - 100px);
+    }
+    .fileDisplayArea{
+        background-color: lightyellow;
+        overflow: scroll;
+        overflow-x: scroll;
+        padding: 5px;
+        font-family: 'Courier New', Courier, monospace
+    }
+
+    .field{
+        background-color: green;
+        position: relative;
+        height: 100%;
+        width: 100%;
+        overflow: auto;
+    }
+
+    #fieldDiv{
+        position: relative;
+        width: 100%;
+    }
+
+
+    /** Tile styling on the grid **/
+    .tile{
+        position: absolute;
+        background-color: skyblue;
+        height: 18px;
+        width: 18px;
+        border-style: solid;
+        border-width: 1px;
+        border-color: green;
+        font-size: 6pt;
+        overflow: hidden;
+    }
+    .linkedTile{
+        background-color: purple;
+    }
+    .tile.selected{
+        background-color: magenta;
+    }
+
+    /** **/
+    .tileInfo {
+        background-color: rgb(241, 241, 241);
+    }
+
+
+
+    .tileEdge{
+        position: absolute;
+        background-color: transparent;
+        height: 5px;
+        width: 5px;
+        font-size: 6pt;
+        overflow:hidden;
+    }
+
+
+    .tileDiv{
+        height: 20px;
+        width: 20px;
+    
+    }
+    .start{
+        background-image: url(start.png);
+    }
+    .halfway{
+        background-image: url(halfway.png);
+    }
+
+
+    .NN{
+        background-image: url(NN.png);
+    }
+    .pNE{
+        background-image: url(NE.png);
+        background-size: cover;
+    }
+    .NW{
+        background-image: url(NW.png);
+    }
+    
+    .SS{
+        background-image: url(SS.png);
+    }
+    .pSE{
+        background-image: url(SE.png);
+        background-size: cover;
+    }
+    .SW{
+        background-image: url(SW.png);
+    }
+
+
+    .EE{
+        background-image: url(EE.png);
+    }
+    .EN{
+        background-image: url(EN.png);
+    }
+    .ES{
+        background-image: url(ES.png);
+    }
+
+    .WW{
+        background-image: url(WW.png);
+    }
+    .WN{
+        background-image: url(WN.png);
+    }
+    .WS{
+        background-image: url(WS.png);
+    }
+
+    .L{
+        background-image: url(left.png)
+    }
+    .R{
+        background-image: url(right.png)
+    }
+
+
+    .redBorder{
+        border-style:solid ; border-width: 1px; border-color: red; 
+    }
+
+    .greenBorder{
+        border-style:solid ; border-width: 1px; border-color: greenyellow; 
+
+    }
+
+    .blueborder{
+        border-style:solid ; border-width: 1px; border-color: navy; 
+    }
+
+    .fatBorder{
+        border-style: solid;
+        border-color: yellow;
+        border-width: 1px;
+    }

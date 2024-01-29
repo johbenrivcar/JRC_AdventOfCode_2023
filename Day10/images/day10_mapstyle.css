@@ -1,0 +1,72 @@
+
+    td{
+        width: 20px;
+        height: 20px;
+        background-size: 20px 20px;
+    }
+    th{
+        width: 20px;
+    }
+    tr{
+        height: 20px;
+    }
+    .tileDiv{
+        height: 20px;
+        width: 20px;
+    
+    }
+    .start{
+        background-image: url(start.png);
+    }
+    .halfway{
+        background-image: url(halfway.png);
+    }
+
+
+    .NN{
+        background-image: url(NN.png);
+    }
+    .NE{
+        background-image: url(NE.png);
+    }
+    .NW{
+        background-image: url(NW.png);
+    }
+    
+    .SS{
+        background-image: url(SS.png);
+    }
+    .SE{
+        background-image: url(SE.png);
+    }
+    .SW{
+        background-image: url(SW.png);
+    }
+
+
+    .EE{
+        background-image: url(EE.png);
+    }
+    .EN{
+        background-image: url(EN.png);
+    }
+    .ES{
+        background-image: url(ES.png);
+    }
+
+    .WW{
+        background-image: url(WW.png);
+    }
+    .WN{
+        background-image: url(WN.png);
+    }
+    .WS{
+        background-image: url(WS.png);
+    }
+
+    .L{
+        background-image: url(left.png)
+    }
+    .R{
+        background-image: url(right.png)
+    }

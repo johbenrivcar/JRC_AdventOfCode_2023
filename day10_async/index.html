@@ -1,0 +1,73 @@
+
+       
+    <html>
+    <head>
+         <meta http-equiv="Access-Control-Allow-Origin"  content='*'>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Pipe grid async</title>
+
+        <!-- Load jquery script files --> 
+        <script src="public/jquery/jquery-3.4.1.js"></script>
+
+        <!-- standard jQuery-ui files-->
+        <link rel="stylesheet" href="public/jquery-ui/jquery-ui.css" />
+        <link rel="stylesheet" href="public/jquery-ui/jquery-ui.structure.min.css" />
+        <link rel="stylesheet" href="public/jquery-ui/jquery-ui.theme.min.css" />
+        <script src="public/jquery-ui/jquery-ui.min.js" ></script>               
+        
+        <link rel="stylesheet" href="images/day10_style.css">
+        
+        <script src="day10_async_script.js"></script>
+
+
+        <script lang="javascript">
+            // date time stamp
+            // now run the program
+            $( runDay10Script );
+            
+            sysEvents.raise( "START" );
+        </script>             
+
+    </head>
+    <body style="display: block; position: relative;">
+        <table style=" border-style:solid ; border-width: 0px; border-color: red; width:100%; top: 0px; left: 0px; position: static; "   >
+            <tr>
+                <td style="width: 500px; vertical-align: top;  border-style:solid; border-width: 1px; border-color: green;">
+                    <b>Day10 done the async way</b>
+                    <div id="date_disp"></div>
+
+                </td>
+                <td style=" vertical-align: top; ">
+                    <div class="tileInfo hidden" id="tile-info">tileInfo here</div>
+                </td>
+            </tr>
+            <tr  id="data-load-area" style="border-style:dashed ; border-width: 1px; border-color: red; max-height:  calc(100vh - 500px);">
+                <td colspan="2" style="vertical-align: top; border-style:dashed ; border-width: 1px; border-color: rgb(247, 0, 255);">
+                    <div>
+                        <div>
+                            Select the input file: 
+                            <input type="file" id="fileInput" >
+                        </div>
+                        <button id="btn-run-input" class="hidden" onClick=" btnRunInput_click(); ">Run this input</button>
+                        <div class="fileDisplayArea hidden">
+                            <div id="file-display-area"  >File display area</div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+            <!-- <tr><td style="vertical-align: top;  border-style:solid; border-width: 1px; border-color: red;"> -->
+
+                <div id="field-map-area" class="outer hidden">
+                    
+                    <button onClick=" selectNewFile(); ">&lt; Back</button>
+                        <div id="fieldDiv" class="scroller">
+                            
+                        </div>
+
+                </div>
+        <!-- </td></tr> -->
+        <!-- </table> -->
+        <div id="footer" style="position: fixed; bottom: 0px; " class="footer">FOOTER</div>
+    </body>
+</html>
