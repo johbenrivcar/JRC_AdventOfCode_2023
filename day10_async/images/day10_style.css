@@ -49,16 +49,17 @@
     .tile{
         position: absolute;
         background-color: skyblue;
-        height: 18px;
-        width: 18px;
+        height: 20px;
+        width: 20px;
         border-style: solid;
-        border-width: 1px;
+        border-width: 0px;
         border-color: green;
         font-size: 6pt;
         overflow: hidden;
     }
     .linkedTile{
-        background-color: purple;
+        background-color: rgb(213, 255, 27);
+        background-size: cover;
     }
     .tile.selected{
         background-color: magenta;
@@ -86,39 +87,61 @@
         width: 20px;
     
     }
-    .start{
+    .pSTRT{
         background-image: url(start.png);
+        background-size: cover;
     }
     .halfway{
         background-image: url(halfway.png);
+        background-size: cover;
     }
 
 
-    .NN{
+
+    .pNN{
         background-image: url(NN.png);
+        background-size: cover;
+        height: 100%;
+        width: 100%;
     }
     .pNE{
         background-image: url(NE.png);
         background-size: cover;
+        height: 100%;
+        width: 100%;
     }
-    .NW{
+    .pNW{
         background-image: url(NW.png);
+        background-size: cover;
+        height: 100%;
+        width: 100%;
     }
     
-    .SS{
+    .pSS{
         background-image: url(SS.png);
+        background-size: cover;
+        height: 100%;
+        width: 100%;
     }
     .pSE{
         background-image: url(SE.png);
         background-size: cover;
+        height: 100%;
+        width: 100%;
     }
-    .SW{
+    .pSW{
         background-image: url(SW.png);
+        background-size: cover;
+        height: 100%;
+        width: 100%;
     }
 
 
-    .EE{
-        background-image: url(EE.png);
+    .pEW{
+        background-image: url(EW.png);
+        background-size: cover;
+        height: 100%;
+        width: 100%;
     }
     .EN{
         background-image: url(EN.png);
@@ -127,8 +150,11 @@
         background-image: url(ES.png);
     }
 
-    .WW{
+    .pWW{
         background-image: url(WW.png);
+        background-size: cover;
+        height: 100%;
+        width: 100%;
     }
     .WN{
         background-image: url(WN.png);

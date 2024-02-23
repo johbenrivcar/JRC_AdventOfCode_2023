@@ -1,5 +1,7 @@
 // Day 10 async script
 
+// const { link } = require("fs");
+
 var fileInputElement
 var fileDisplayElement
 var footerElement
@@ -20,120 +22,6 @@ const linkTravelDirections = {
     , S: { out: "S", in: "N" }
     , W: { out: "W", in: "E" }
 }
-
-    /** EventStream Class ===========================================================================================
-     * Provides a means of publishing and subscribing to a stream of events.
-     * Events are objects that are published, i.e. made available, by a publisher to a subscriber
-     * Events are published in streams. The publisher uses a stream to publish events,
-     * and many subscribers can use the stream to subscribe to those events. The publisher
-     * optionally sends one item of data with the event which is sent to all subscribers.
-     * When the publisher publishes an event the stream sends it **asynchronously** to all 
-     *  the subscribers who have matching subscription keys.
-     * An event has a type, which is a string set by the publisher. An event type can have multiple parts, each separated by a dot
-     * A subscriber can specify which type of event they wish to recieve, by specifying the type string. A subscriber can use
-     * an * as any part of a key to denote that they will accept any value in that part of the key. An * at the end of a subscription
-     * key will match an event key that has multiple parts beyond the position of the *.
-     * 
-     * Example.                 Event with key A.B.C.D  Event with key A.X.Y.D
-     *  Subscriber to key        - receives the event?    - receives the event?
-     *  A.B.C.D                     yes                         No
-     *  A                           No                          No
-     *  A.*                         Yes                         Yes
-     *  A.*.C                       No                          No
-     *  A.*.C.*                     Yes                         No
-     *  A.*.*.D                     Yes                         Yes
-     *  
-     * When registering to receive events, a subscriber may optionally supply a single data item
-     * (of any type) to be associated with the subscription. This data is returned with the event
-     * every time an event in the stream is sent to the subscriber.
-     *  
-     * */
-    var eventSerial = 0;
-    class EventStream{
-
-        // List of subscribers
-        subs = [];
-        name = "";
-        verbose = false;
-
-        // Logging function
-        log(xx, yy){ 
-            console.log( `E[${this.name}]:`, xx ) ; 
-            if(yy) console.log("           :", yy);
-        };
-
-        /** 
-         * Subscribe function called by a consumer of 
-         * events to register an event handler function, The
-         * event handler function is called to handle the
-         * event when an event is published with a matching
-         * event type.
-         * */
-        on(type, handler , userData ){
-            //this.log(`subscribing type ${type} with subtype ${ type.slice(0,-1) }`);
-            let keys = type.split(".");
-            let sub = { type, keys, handler, userData }
-            //this.log("Registering event subscriber ", sub)
-
-            this.subs.push( sub );
-        }
-
-        /**
-         * Constructor for the event stream. The Optional
-         * parameter is a string naming the event stream.
-         * If given, the stream is added as a global 
-         * variable with the name of the event stream.
-         * @param {string} esName 
-         */
-        constructor( esName ){
-            if( typeof esName == "string"&& esName.length > 0 ) {this.name = esName} else {esName = ""};
-            let me = this;
-            
-            if(esName.length>0) window[esName] = me;
-
-            this.raise = 
-                function(type, eventData = {} ){
-                    try{ eventData.sn = eventSerial++ } catch(e){};
-                    this.log(`>>>>>>>>>>>>>>>>>>>>>>>> raising type ${type}`)
-                    let evKeys = type.split(".");
-                    let notifyType = (this.name.length>0? this.name + " " : "" ) + type;
-                    me.subs.forEach( 
-                        sub=>{
-                            //this.log(`-- checking`, sub)
-                            if(sub.keys.length > evKeys.length) return;
-                            if (
-                                sub.keys.every(
-                                    (key, ix)=>{
-                                        switch(true){
-                                            // case ix >= evKeys.length:
-                                            //     return false;
-                                            case key == "*":            // wild card on the listener key
-                                            case key == evKeys[ix]:     // match event to listener key
-                                            case evKeys[ix]=="*":       // wild card on event key
-                                                return true;            // we have a match
-                                            default:
-                                                return false;
-                                        }
-                                    }
-                                )
-                            ){
-                                // This is the async function call to actually send the event to the 
-                                // event handler for the subscriber.
-                                setTimeout( 
-                                    ()=>{
-                                        sub.handler(notifyType, eventData, sub.userData );
-                                    }
-                                    , 10
-                                );
-                            }
-                        }
-                    );
-                };
-                
-        };
-    };
-
-// =====================================================================================================
 
 
 new EventStream("sysEvents");
@@ -156,17 +44,18 @@ function runDay10Script(){
     
     let msg = `Today's date is ${dtLoad.toISOString()}`;
     writeToDiv( "date_disp",  msg) ;
-    console.log("Running ====================================")
+    console.log(`Starting ====================================`)
     
     // Get references to the dialog for loading the grid data
     fileInputElement = document.getElementById('fileInput');
-    fileDisplayElement = document.getElementById('file-display-area');
-    footerElement = $(`#footer`);
-    tileInfoElement = $(`#tile-info`);
-
     // add a listener for when the user chooses a file to be
     // loaded.
     fileInputElement.addEventListener('change', fileInput_change);
+
+    /** JQuery references to screen display elements */
+    fileDisplayElement = $('#file-display-area');
+    footerElement = $(`#footer`);
+    tileInfoElement = $(`#tile-info`);
 
 
 }
@@ -203,7 +92,7 @@ function fileInput_change() {
 
     } else {
         /** could not read the file */
-        fileDisplayElement.innerText = "File not supported!";
+        fileDisplayElement.html(  "File not supported!" ) ;
     }
 }
 
@@ -216,7 +105,7 @@ function displayDataToUser(){
     //console.log(`data received` , readData);
 
     /** Put the whole content into the screen display element */
-    fileDisplayElement.innerText = inputInfo.fileContent;
+    fileDisplayElement.html(inputInfo.fileContent);
 
     inputInfo.lines = inputInfo.fileContent.split( /\r/g );
     inputInfo.rowsCount = inputInfo.lines.length;
@@ -336,7 +225,7 @@ function generateGridHTML(gridSizePX=20, rows=inputInfo.rowsCount, cols=inputInf
                 + ` style=" top: ${rowTop}px; left: ${colLeft}px; "`  
                 + ` onClick="showTileInfo( '${key}' ); return false; "   `
                 + ` `
-                + ` > </div>`
+                + ` > <div id="${key}_pipe" class="" > </div></div>`
         
         }
         grid+=`<div class="tileEdge" style="top: ${rowTop}; left: ${5 + cols*gridSizePX };"></div>`
@@ -387,15 +276,19 @@ class GridTileSquare{
     pipeChar;
     pipeClass;
     gridHtmlElement;
+    pipeHtmlElement;
     tile;
     classes="";
-
+    pipeClasses = "";
     constructor(row, col){
         console.log(`Constructing GridTileSquare[${row}, ${col}]`)
         let key=this.key=tileKey(row,col);
         this.gridHtmlElement = $(`#${key}`);
+        this.pipeHtmlElement = $(`#${key}_pipe`)
         if(!this.gridHtmlElement){
             console.log(`Could not link this GridTileSquare to html element with id [${key}]`)
+        }if(!this.pipeHtmlElement){
+            console.log(`Could not link this GridTileSquare to pipe element with id [${key}_pipe]`)
         }
         // Register in the index of all grid squares
         allGridSquares[key]=this;
@@ -423,14 +316,31 @@ class GridTileSquare{
         return this;
     };
 
+    addPipeClass(clss){
+        this.pipeHtmlElement.addClass(clss);
+        if(!this.hasPipeClass(clss)) this.pipeClasses+=`[${clss}]`
+        console.log(`Adding class [${clss}] to pipe [${this.key}_pipe], now has classes [${this.pipeClasses}]`)
+        return this;
+    };
     removeClass(clss){
         this.gridHtmlElement.removeClass(clss);
         this.classes = this.classes.replace(`[${clss}]`,``);
         return this;
     };
+    removePipeClass(clss){
+
+        this.pipeHtmlElement.removeClass(clss);
+        this.pipeClasses = this.pipeClasses.replace(`[${clss}]`,``);
+        return this;
+    };
+
     hasClass(clss){
         return this.classes.includes(`[${clss}]`);
     }
+    hasPipeClass(clss){
+        return this.pipeClasses.includes(  `[${clss}]`);
+    }
+
     setTile( tile ){
         this.tile = tile;
         this.setPipe( this.tile.pipeChar );
@@ -438,9 +348,9 @@ class GridTileSquare{
 
     setPipe(char){
         this.pipeChar=char;
-        if(this.pipeClass) this.removeClass(this.pipeClass);
+        if(this.pipeClass) this.removePipeClass(this.pipeClass);
         this.pipeClass = pipeChar2Class(char);
-        this.addClass(this.pipeClass)
+        this.addPipeClass(this.pipeClass)
     }
 }
 
@@ -459,8 +369,21 @@ function buildGridElementIndex(){
 
     console.log("GridElementIndex completed")
 
-    run10ms( ()=>{ new Tile(2, 2, "F") } );
 
+    for(let ir = 0; ir < inputInfo.rowsCount; ir++ ){
+        let chars = inputInfo.lines[ir].split("");
+        for(let ic=0; ic < inputInfo.colsCount; ic++){
+            //let key = tileKey(ir,ic);
+            let char = chars[ic];
+            if(ir==5 && ic == 10) console.log("creating tilegridsquare at r5 c10")
+            new Tile(ir, ic, char)
+        }
+    }
+
+
+    //run10ms( ()=>{ new Tile( 2,  2, "F") } );
+
+    //run10ms( ()=>{ new Tile(10, 12, "|") } );
 
 }
 
@@ -537,19 +460,20 @@ function pipeChar2Class(char){
     return pipeClasses[pipeChar2Ix(char)];
 }
 const pipeChars = ".|-JLF7S";
+let ltd = linkTravelDirections;
 const pipeDirections =[
     []
-    , [N, S]
-    , [E, W]
-    , [S, W]
-    , [S, E]
-    , [N, E]
-    , [N, W]
-    , [N, S, E, W]
+    , [ltd.N, ltd.N]
+    , [ltd.W, ltd.W]
+    , [ltd.S, ltd.W]
+    , [ltd.S, ltd.E]
+    , [ltd.N, ltd.E]
+    , [ltd.N, ltd.W]
+    , [ltd.N, ltd.S, ltd.E, ltd.W]
 ]
 const pipeClasses = [
     'pNone',
-    'pNS',
+    'pNN',
     'pEW',
     'pSW',
     'pSE',
