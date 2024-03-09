@@ -1,10 +1,10 @@
 // Day 10 async script
-function consoleLog(...args){
-    console.log(...args);
-}
+// function console.log(...args){
+//     console.log(...args);
+// }
 // const { link } = require("fs");
 var logIds = [ tileKey(5,1) ]; //[ tileKey(4,4), tileKey(4,5), tileKey(1,3) ];
-consoleLog(`Logging turned on for`, logIds);
+console.log(`Logging turned on for`, logIds);
 var fileInputElement
 var fileDisplayElement
 var footerElement
@@ -18,10 +18,6 @@ var allGridSquares = {};
 
 var gridSquareSize = 20;
 var gridTileSize = 20;
-
-var actionQueue = new ActionQueue;
-actionQueue.addAction(()=>{ consoleLog("Action queue is working") }, 0);
-actionQueue.run();
 
 
 const dirN = "dirN";
@@ -65,7 +61,7 @@ function getPipeInfoFromChar(char){
 };
 
 
-function logEvent(type, eventData, userData){ consoleLog( `E[${type}]`, userData, eventData) };
+function logEvent(type, eventData, userData){ console.log( `E[${type}]`, userData, eventData) };
 
 function initEventStreams(){
         
@@ -76,7 +72,8 @@ function initEventStreams(){
 
     sysEvents.on("*", logEvent, "sys")
     tileEvents.on("*", logEvent, "tile")
-    consoleLog("Event streams created");
+
+    console.log("Event streams created");
 }
 initEventStreams();
 
@@ -89,7 +86,7 @@ function runDay10Script(){
     let msg = `Today's date is ${dtLoad.toISOString()}`;
     writeToDiv( "date_disp",  msg) ;
 
-    consoleLog(`Starting ====================================`)
+    console.log(`Starting ====================================`)
     
     // Get references to the dialog for loading the grid data
     fileInputElement = document.getElementById('fileInput');
@@ -111,7 +108,7 @@ function runDay10Script(){
  */
 function fileInput_change() {
     var file = fileInputElement.files[0];
-    consoleLog(`file`, file);
+    console.log(`file`, file);
 
     // check that a text file was chosen
     var textType = /text.*/;
@@ -125,7 +122,7 @@ function fileInput_change() {
                 /** Get the whole file content from the reader */
                 inputInfo.fileContent = reader.result;
 
-                consoleLog(`fileContent`, inputInfo.fileContent)
+                console.log(`fileContent`, inputInfo.fileContent)
 
                 /** display content to the user
                  *  so the user can check; */
@@ -151,7 +148,7 @@ function fileInput_change() {
  * to run the process to render the grid.
  */
 function displayDataToUser(){
-    //consoleLog(`data received` , readData);
+    //console.log(`data received` , readData);
 
     /** Put the whole content into the screen display element */
     fileDisplayElement.html(inputInfo.fileContent);
@@ -168,8 +165,8 @@ function displayDataToUser(){
     // Assuming that all lines in the file have the same length!!
     inputInfo.colsCount = inputInfo.lines[0].length;
 
-    consoleLog(`${inputInfo.rowsCount} lines`);
-    consoleLog(`Line length: ${inputInfo.colsCount}`);
+    console.log(`${inputInfo.rowsCount} lines`);
+    console.log(`Line length: ${inputInfo.colsCount}`);
 
     footerElement.html( `${inputInfo.rowsCount} rows x ${inputInfo.colsCount} cols` );
 
@@ -200,7 +197,7 @@ function btnRunInput_click(){
  * Create the display grid and start the whole grid loading process 
  * */
 function runLoadedInput(){
-    consoleLog(">> runLoadedInput")
+    console.log(">> runLoadedInput")
     /** Hide the displayed file content and show the grid map area */
     hideById("data-load-area")
     showById("field-map-area")
@@ -212,12 +209,13 @@ function runLoadedInput(){
     // setTimeout( ()=>{
     //     buildGridElementIndex();
     // }, 10);
-    consoleLog("Adding first action...");
-    actionQueue.addAction( buildGridElementIndex , 0);
+    console.log("Adding first action...");
+    //actionQueue.addAction( buildGridElementIndex , 0);
+    addToAsyncQueue(buildGridElementIndex);
 
-    consoleLog("Running...");
+    console.log("Running...");
 
-    actionQueue.run();
+    //actionQueue.run();
 
 }
 
@@ -238,7 +236,7 @@ function selectNewFile(){
 
 /** UTILITY FUNCTIONS FOR SHOWING AND HIDING ELEMENTS ON THE DISPLAY PANEL */
 function hideById(id){
-    consoleLog(`hiding ${id}`);
+    console.log(`hiding ${id}`);
     $(`#${id}`).addClass("hidden");
 }
 
@@ -253,7 +251,7 @@ function showByClass(cls){
 }
 
 function getByClass(cls){
-    consoleLog(`Selecting all elements by class [${cls}]`);
+    console.log(`Selecting all elements by class [${cls}]`);
     return $(`.${cls}`);
 }
 
@@ -262,7 +260,7 @@ function getByClass(cls){
  *  taken from the input text file
  */
 function generateGridHTML(gridSizePX=20, rows=inputInfo.rowsCount, cols=inputInfo.colsCount){
-    consoleLog(">>generateGridHTML")
+    console.log(">>generateGridHTML")
     //let grid = `<div style="height: ${gridSizePX*rows+20}px; width=${wpx*cols+20}px"  class="field" >`;
     let grid = `<div   class="field"   >`;
     for(let row = 0; row< rows; row++){
@@ -288,7 +286,7 @@ function generateGridHTML(gridSizePX=20, rows=inputInfo.rowsCount, cols=inputInf
     }
 
     grid+=`</div>`
-    consoleLog(`grid`, grid);
+    console.log(`grid`, grid);
     $(`#fieldDiv`).html(grid);
 
 }
@@ -299,7 +297,7 @@ function showTileInfo( key ){
     let gs = allGridSquares[key];
     showById(`tile-info`)
     if(gs){
-        consoleLog(`GS ${key} found!!`);
+        console.log(`GS ${key} found!!`);
 
         getByClass(`selected`).removeClass(`selected fatborder`);
 
@@ -312,7 +310,7 @@ function showTileInfo( key ){
         return false;
     }
 
-    consoleLog(`GS ${key} not found...??`);
+    console.log(`GS ${key} not found...??`);
 
 }
 
@@ -333,14 +331,14 @@ class GridTileSquare{
     classes="";
     pipeClasses = "";
     constructor(row, col){
-        consoleLog(`Constructing GridTileSquare[${row}, ${col}]`)
+        console.log(`Constructing GridTileSquare[${row}, ${col}]`)
         let key=this.key=tileKey(row,col);
         this.gridHtmlElement = $(`#${key}`);
         this.pipeHtmlElement = $(`#${key}_pipe`)
         if(!this.gridHtmlElement){
-            consoleLog(`Could not link this GridTileSquare to html element with id [${key}]`)
+            console.log(`Could not link this GridTileSquare to html element with id [${key}]`)
         }if(!this.pipeHtmlElement){
-            consoleLog(`Could not link this GridTileSquare to pipe element with id [${key}_pipe]`)
+            console.log(`Could not link this GridTileSquare to pipe element with id [${key}_pipe]`)
         }
         // Register in the index of all grid squares
         allGridSquares[key]=this;
@@ -369,14 +367,14 @@ class GridTileSquare{
     addClass(clss){
         this.gridHtmlElement.addClass(clss);
         if(!this.hasClass(clss)) this.classes+=`[${clss}]`
-        consoleLog(`Adding class [${clss}] to element [${this.key}], now has classes [${this.classes}]`)
+        console.log(`Adding class [${clss}] to element [${this.key}], now has classes [${this.classes}]`)
         return this;
     };
 
     addPipeClass(clss){
         this.pipeHtmlElement.addClass(clss);
         if(!this.hasPipeClass(clss)) this.pipeClasses+=`[${clss}]`
-        consoleLog(`Adding class [${clss}] to pipe [${this.key}_pipe], now has classes [${this.pipeClasses}]`)
+        console.log(`Adding class [${clss}] to pipe [${this.key}_pipe], now has classes [${this.pipeClasses}]`)
         return this;
     };
     removeClass(clss){
@@ -443,12 +441,12 @@ function buildGridElementIndex(){
     for(let ir = 0; ir < inputInfo.rowsCount; ir++ ){
         for(let ic=0; ic < inputInfo.colsCount; ic++){
             //let key = tileKey(ir,ic);
-            if(ir==5 && ic == 10) consoleLog("creating tilegridsquare at r5 c10")
+            if(ir==5 && ic == 10) console.log("creating tilegridsquare at r5 c10")
             new GridTileSquare(ir, ic)
         }
     }
 
-    consoleLog("GridElementIndex completed")
+    console.log("GridElementIndex completed")
 
 
     for(let ir = 0; ir < inputInfo.rowsCount; ir++ ){
@@ -456,19 +454,13 @@ function buildGridElementIndex(){
         for(let ic=0; ic < inputInfo.colsCount; ic++){
             //let key = tileKey(ir,ic);
             let char = chars[ic];
-            //if(ir==5 && ic == 10) consoleLog("creating tilegridsquare at r5 c10")
-            runRandomTime( ()=>{
+            //if(ir==5 && ic == 10) console.log("creating tilegridsquare at r5 c10")
+            addToAsyncQueue( ()=>{
                     new Tile(ir, ic, char)
-                },
-                3
-                )
+                })
         }
     }
 
-
-    //run10ms( ()=>{ new Tile( 2,  2, "F") } );
-
-    //run10ms( ()=>{ new Tile(10, 12, "|") } );
 
 }
 
@@ -511,10 +503,10 @@ class Tile{
         };
 
         let me = this;
-        runRandomTime( ()=>{
+
+        addToAsyncQueue( ()=>{
             me.tryPipeConnections();
-        },
-        1)
+        } )
 
         tileEvents.raise(`new.${key}`, this);
 
@@ -574,7 +566,7 @@ class Tile{
     };
     log(...params){
         if(this.logging)
-         consoleLog(`*Tile ${this.id}:`, ...params);
+         console.log(`*Tile ${this.id}:`, ...params);
     };
 
 }
@@ -597,49 +589,51 @@ class ActionQueue{
         for(var ix=0; ix<1000; ix++ ){
             this._buckets.push( [] );
         }
-        consoleLog("Action queue created");
+        console.log(`Action queue created with ${this._buckets.length} buckets`);
     }
 
-    addAction(actionFunction, bn="xxx"){
+    addAction(actionFunction, bn="*"){
         
-        consoleLog("Adding action ", bn)
-        if(bn=="xxx") bn = this._randomBucketNumber();
+        if(bn=="*") bn = this._randomBucketNumber();
         
-        actionCount++;
-        let bkt = _buckets[bn];
+        console.log("Adding action ", bn)
+
+        this.actionCount++;
+        let bkt = this._buckets[bn];
         bkt.push(actionFunction);
 
-    }
+    };
 
     _runNext(){
 
-        if (actionCount>1){
-            this.log("No more actions to be run - End of run");
+        if (this.actionCount<1){
+            this._log("No more actions to be run - End of run");
             return false;
         }
 
-        let bucketnumber = 0;
-        if(this._buckets[0].length == 0) bucketNumber = this._randomBucketNumber;
+        let bucketNumber = 0;
+        if(this._buckets[0].length == 0) bucketNumber = this._randomBucketNumber();
+        console.log(`Getting bucket ${bucketNumber}`)
+        let bkt = this._buckets[bucketNumber];
         
-        let bkt = _buckets[bn];
         if( bkt.length == 0 ) { 
             // Nothing to run in this bucket - try another
-            _loopCheck++;
-            if(_loopCheck > 10000){
-                this.log("Exceeded loop check limit");
+            this._loopCheck++;
+            if(this._loopCheck > 10000){
+                this._log("Exceeded loop check limit");
                 return false;
             }
             return true };
 
-        _loopCheck=0;
+        this._loopCheck=0;
         let fn = bkt.shift();
-        if(fn) { actionCount--; fn(); }
+        if(fn) { this.actionCount--; fn(); }
         return true;
 
     }
     
     run(){
-        this.log(">>RUNNING --------------------------------")
+        this._log(">>RUNNING --------------------------------")
         let xxx = true;
         do {
             xxx = this._runNext();
@@ -648,14 +642,25 @@ class ActionQueue{
 
     _randomBucketNumber(){
         let ix = (Math.random() * 8999)
+        // Returns a value in the range 1-9
         return Math.trunc( 1 + ix/10 );
     }
 
     _log( ...args ){
         //if(this._logging) 
-            consoleLog(`ActionQueue:`, ...args);
+            console.log(`ActionQueue:`, ...args);
     }
 }
+
+
+var actionQueue = new ActionQueue;
+
+//actionQueue.addAction(()=>{ console.log("Action queue is working") }, 0);
+//actionQueue.run();
+
+addToAsyncQueue(()=>{ console.log("Action queue is working") });
+
+
 /** PIPE CLASS ============================================================== */
 class Pipe{
     row;
@@ -679,26 +684,31 @@ class Pipe{
     }
 }
 
-/** Runs the given function f
- * after a delay up to the max limit
- * of secs seconds
- */
-function runRandomTime(f, secs){
-    // let tDelay = Math.round( Math.random() * secs * 1000 );
-    // setTimeout( 
-    //     f,
-    //     tDelay
-    // )
-    actionQueue.addAction(f);
+
+/** ASYNC Function runner, gives the opportunity for html updates to happen during processing */
+var waitingToBeRun = [];
+var running = false;
+function addToAsyncQueue(f){
+    waitingToBeRun.push( f );
+    if(running) return;
+    runNextAsync();
+}
+function runNextAsync(){
+
+    running = waitingToBeRun.length > 0;
+    if(running){
+        let nextIx = Math.trunc( (Math.random * waitingToBeRun.length - 1) )
+        let nextFn = waitingToBeRun[nextIx];
+        console.log(`asyncQ.length=${waitingToBeRun.length}. Next function to be run is at index ${nextIx}`);
+        //slice the selected function from the queue
+        waitingToBeRun = waitingToBeRun.slice(0,nextIx).concat(waitingToBeRun.slice(nextIx+1));
+        setImmediate( ()=>{
+            nextFn();
+            runNextAsync();
+        });
+    }
 }
 
-function run10ms(f){
-    // setTimeout( 
-    //     f
-    //     , 10
-    // );
-    actionQueue.addAction(f,0);
-}
 
 
 /** Returns a standardised key string to locate a position
@@ -734,21 +744,21 @@ function div( content ){return `<div>${content}</div>`}
 
 
 function writeToDiv(id, content){ 
-    //consoleLog(`Writing content to [${id}]`, content)
+    //console.log(`Writing content to [${id}]`, content)
     $(`#${id}`).html(content);
 }
 
 function testEventStreamer(){
-    consoleLog("Testing event streamer");
+    console.log("Testing event streamer");
     let h1 = function(type, ev, userData){
-        consoleLog("H1:", type, ev, userData )
+        console.log("H1:", type, ev, userData )
     }
     let h2 = function(type, ev, userData){
-        consoleLog("H2:", type, ev, userData )
+        console.log("H2:", type, ev, userData )
     }
 
     let h3 = function(type, ev, userData){
-        consoleLog("H3:", type, ev, userData )
+        console.log("H3:", type, ev, userData )
     }
     
     sysEvents.on("A", h1, "A/H1" );
@@ -764,6 +774,6 @@ function testEventStreamer(){
     sysEvents.raise("C", { type: "C", n: 5});
     sysEvents.raise("A", { type: "A", n: 6});
 
-    consoleLog("Finished testing event streamer")
+    console.log("Finished testing event streamer")
 }
 //testEventStreamer();
