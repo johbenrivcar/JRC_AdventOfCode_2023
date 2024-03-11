@@ -77,6 +77,11 @@ function initEventStreams(){
 }
 initEventStreams();
 
+/** ASYNC Function runner, gives the opportunity for html updates to happen during processing */
+var waitingToBeRun = [];
+var asyncQueueRunning = false;
+
+
 /**
  * This is run when the initial page load is complete
  */
@@ -657,9 +662,13 @@ var actionQueue = new ActionQueue;
 
 //actionQueue.addAction(()=>{ console.log("Action queue is working") }, 0);
 //actionQueue.run();
-
-addToAsyncQueue(()=>{ console.log("Action queue is working") });
-
+console.log("Test async queue");
+addToAsyncQueue(()=>{ console.log("Action queue is working 1") });
+addToAsyncQueue(()=>{ console.log("Action queue is working 2") });
+addToAsyncQueue(()=>{ console.log("Action queue is working 3") });
+addToAsyncQueue(()=>{ console.log("Action queue is working 4") });
+addToAsyncQueue(()=>{ console.log("Action queue is working 5") });
+console.log("Async functions added")
 
 /** PIPE CLASS ============================================================== */
 class Pipe{
@@ -685,28 +694,42 @@ class Pipe{
 }
 
 
-/** ASYNC Function runner, gives the opportunity for html updates to happen during processing */
-var waitingToBeRun = [];
-var running = false;
 function addToAsyncQueue(f){
-    waitingToBeRun.push( f );
-    if(running) return;
-    runNextAsync();
+    let qLen = waitingToBeRun.push( f );
+    console.log(`Added function to queue, length now ${ qLen }.`)
+    if(asyncQueueRunning) return;
+    asyncQueueRunning = true;
+    setTimeout( ()=>{runNextAsync()}, 20);
 }
-function runNextAsync(){
 
-    running = waitingToBeRun.length > 0;
-    if(running){
-        let nextIx = Math.trunc( (Math.random * waitingToBeRun.length - 1) )
-        let nextFn = waitingToBeRun[nextIx];
-        console.log(`asyncQ.length=${waitingToBeRun.length}. Next function to be run is at index ${nextIx}`);
-        //slice the selected function from the queue
-        waitingToBeRun = waitingToBeRun.slice(0,nextIx).concat(waitingToBeRun.slice(nextIx+1));
-        setImmediate( ()=>{
-            nextFn();
-            runNextAsync();
-        });
-    }
+function runNextAsync(){
+    let qLen = waitingToBeRun.length;
+
+    console.log(`runNextAsync [queue length ${qLen}]`);
+
+    let runningQ = [];
+    let ratio = 100.0 / qLen;
+
+    // Filters out approximately 100 randomly selected function from the waiting queue.
+    waitingToBeRun = waitingToBeRun.filter( ( fn )=>{
+            let yn = Math.random() > ratio;
+            if(yn) return true;
+            runningQ.push(fn)
+            return false;
+        }
+    );
+
+    runningQ.forEach( (fn)=>{
+        fn();
+    })
+
+    qLen = waitingToBeRun.length
+    if( qLen > 0 ) {
+        console.log(`After async, queue length is ${qlen}, so Async will be rerun in 20ms`)
+        setTimeout( ()=>{runNextAsync()}, 1000);
+    } else {
+        asyncQueueRunning = false;
+    };
 }
 
 

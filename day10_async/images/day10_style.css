@@ -48,7 +48,7 @@
     /** Tile styling on the grid **/
     .tile{
         position: absolute;
-        background-color: skyblue;
+        background-color: navy;
         height: 20px;
         width: 20px;
         border-style: solid;
@@ -70,7 +70,7 @@
     .tile.cnx1{
         background-color: orange;
     }
-    
+
     .tile.cnx2{
         background-color: rgb(101, 231, 129);
     }
