@@ -295,6 +295,7 @@ function generateGridHTML(gridSizePX=20, rows=inputInfo.rowsCount, cols=inputInf
     $(`#fieldDiv`).html(grid);
 
 }
+
 /**
  * 
  */
@@ -576,99 +577,7 @@ class Tile{
 
 }
 
-class ActionQueue{
-/**
- * Randomized selection of actions to be done in a queue.
- * An action to be done is handed as a function with no parameters to the scheduler.
- * An action is given an index number which is used as a key on the actionsWaiting object.
- * The index number is a random number between 1 and 9999999.
- * The scheduler places the action in a random position in a queue of actions.
- * Actions are performed, in turn, from the front of the action queue, by
- */
-    _logging = true;
-    _buckets=[];
-    actionCount = 0;
-    _loopCheck = 0;
 
-    constructor(){
-        for(var ix=0; ix<1000; ix++ ){
-            this._buckets.push( [] );
-        }
-        console.log(`Action queue created with ${this._buckets.length} buckets`);
-    }
-
-    addAction(actionFunction, bn="*"){
-        
-        if(bn=="*") bn = this._randomBucketNumber();
-        
-        console.log("Adding action ", bn)
-
-        this.actionCount++;
-        let bkt = this._buckets[bn];
-        bkt.push(actionFunction);
-
-    };
-
-    _runNext(){
-
-        if (this.actionCount<1){
-            this._log("No more actions to be run - End of run");
-            return false;
-        }
-
-        let bucketNumber = 0;
-        if(this._buckets[0].length == 0) bucketNumber = this._randomBucketNumber();
-        console.log(`Getting bucket ${bucketNumber}`)
-        let bkt = this._buckets[bucketNumber];
-        
-        if( bkt.length == 0 ) { 
-            // Nothing to run in this bucket - try another
-            this._loopCheck++;
-            if(this._loopCheck > 10000){
-                this._log("Exceeded loop check limit");
-                return false;
-            }
-            return true };
-
-        this._loopCheck=0;
-        let fn = bkt.shift();
-        if(fn) { this.actionCount--; fn(); }
-        return true;
-
-    }
-    
-    run(){
-        this._log(">>RUNNING --------------------------------")
-        let xxx = true;
-        do {
-            xxx = this._runNext();
-        } while ( xxx );
-    }
-
-    _randomBucketNumber(){
-        let ix = (Math.random() * 8999)
-        // Returns a value in the range 1-9
-        return Math.trunc( 1 + ix/10 );
-    }
-
-    _log( ...args ){
-        //if(this._logging) 
-            console.log(`ActionQueue:`, ...args);
-    }
-}
-
-
-var actionQueue = new ActionQueue;
-
-//actionQueue.addAction(()=>{ console.log("Action queue is working") }, 0);
-//actionQueue.run();
-console.log("Test async queue");
-addToAsyncQueue(()=>{ console.log("Action queue is working 1") });
-addToAsyncQueue(()=>{ console.log("Action queue is working 2") });
-addToAsyncQueue(()=>{ console.log("Action queue is working 3") });
-addToAsyncQueue(()=>{ console.log("Action queue is working 4") });
-addToAsyncQueue(()=>{ console.log("Action queue is working 5") });
-console.log("Async functions added")
 
 /** PIPE CLASS ============================================================== */
 class Pipe{
@@ -710,7 +619,9 @@ function runNextAsync(){
     let runningQ = [];
     let ratio = 100.0 / qLen;
 
-    // Filters out approximately 100 randomly selected function from the waiting queue.
+    // Filters out approximately 25 randomly selected functions from 
+    // the waiting queue and puts them into the running queue ready to be
+    // run.
     waitingToBeRun = waitingToBeRun.filter( ( fn )=>{
             let yn = Math.random() > ratio;
             if(yn) return true;
@@ -719,14 +630,17 @@ function runNextAsync(){
         }
     );
 
-    runningQ.forEach( (fn)=>{
+    console.log(`Running queue of length ${runningQ.length} has been constructed, now running...`)
+    // Now runs each of the functions in the running queue;
+    runningQ.forEach( (fn, ix)=>{
+        console.log(`*** Running async queue #${ix} ************************************************************************`)
         fn();
     })
 
     qLen = waitingToBeRun.length
     if( qLen > 0 ) {
-        console.log(`After async, queue length is ${qlen}, so Async will be rerun in 20ms`)
-        setTimeout( ()=>{runNextAsync()}, 1000);
+        console.log(`After async, queue length is ${qLen}, so Async will be rerun in 10ms`)
+        setTimeout( ()=>{runNextAsync()}, 10);
     } else {
         asyncQueueRunning = false;
     };
